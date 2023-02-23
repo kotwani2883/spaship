@@ -33,7 +33,9 @@ export const WebPropertyCard = ({ title, subtitle, children, footer, isSelected 
     </CardTitle>
     <CardBody>{children}</CardBody>
     <CardFooter>
-      <Text className="pf-u-color-400">{footer}</Text>
+      <Text className="pf-u-color-700" style={{ fontWeight: 'bold' }}>
+        {footer}
+      </Text>
     </CardFooter>
   </Card>
 );
