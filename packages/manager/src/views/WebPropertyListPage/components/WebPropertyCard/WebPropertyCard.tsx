@@ -50,8 +50,8 @@ export const WebPropertyCard = ({
           </Text>
         </CardTitle>
         <CardBody>{children}</CardBody>
-        <CardFooter style={{marginTop:'10px'}}>
-          <Text className="pf-u-color-700" style={{ fontWeight: 'bold'}}>
+        <CardFooter style={{ marginTop: '10px' }}>
+          <Text className="pf-u-color-700" style={{ fontWeight: 'bold' }}>
             {footer}
           </Text>
         </CardFooter>
