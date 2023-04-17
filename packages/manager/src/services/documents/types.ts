@@ -13,4 +13,5 @@ type Tutorial = {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  _id: number
 };

@@ -18,18 +18,34 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
-  ToolbarItem
+  ToolbarItem,
+  NotificationDrawer,
+  NotificationDrawerBody,
+  NotificationDrawerHeader,
+  NotificationDrawerList,
+  NotificationDrawerListItem,
+  NotificationDrawerListItemBody,
+  NotificationDrawerListItemHeader,
+  NotificationBadge,
+  Badge
 } from '@patternfly/react-core';
 import { BellIcon } from '@patternfly/react-icons';
 import { env } from '@app/config/env';
 import { useToggle } from '@app/hooks';
 import { pageLinks } from '@app/links';
 import { deleteOrchestratorAuthorizationHeader } from '@app/config/orchestratorReq';
+import { useEffect, useState } from 'react';
+import { useGetDocumentPage } from '@app/services/documents';
 
 export const Nav = () => {
   const { data: session } = useSession();
   const [isSigningOut, setIsSigningOut] = useToggle();
-
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // state to control the Notification Drawer
+  const dataForNotifications = useGetDocumentPage();
+  const bannerNotifications = dataForNotifications?.data?.banner ?? [];
+  const bannerNotificationCount = bannerNotifications.length;
+  console.log(bannerNotifications)
   const onSignOut = () => {
     setIsSigningOut.on();
     signOut({ redirect: false, callbackUrl: pageLinks.loginPage })
@@ -41,6 +57,24 @@ export const Nav = () => {
         setIsSigningOut.off();
       });
   };
+  const handleNotificationClick = () => {
+    // TODO: Handle notification click
+    setNotificationCount(notificationCount - bannerNotificationCount);
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+  };
+
+  const handleBellIconClick = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+    setNotificationCount(0);
+  };
+
+
+  useEffect(() => {
+    setNotificationCount(bannerNotifications.length);
+  }, [bannerNotifications]);
 
   return (
     <Masthead backgroundColor="dark" style={{ padding: 0 }}>
@@ -72,9 +106,61 @@ export const Nav = () => {
                 </Button>
               </ToolbarItem>
               <ToolbarItem>
-                <Button aria-label="Notifications" variant={ButtonVariant.plain}>
-                  <BellIcon size="md" />
-                </Button>
+              <div style={{ position: 'relative', display: 'inline-block',marginRight:'10px' }}>
+      <BellIcon onClick={handleBellIconClick} />
+      {notificationCount > 0 && (
+        <Badge
+          isRead={false}
+          style={{
+            position: 'absolute',
+            top: '-10px',
+            right: '-10px',
+            fontSize: '11px',
+            minWidth: '16px',
+            height: '17px',
+            borderRadius: '9px',
+            padding: '2px 4px',
+            backgroundColor: '#f0ab00',
+            color: 'black',
+            textAlign: 'center',
+            fontWeight:'bolder'
+          }}
+        >
+          {notificationCount}
+        </Badge>
+      )}
+        {isDrawerOpen && (
+         <NotificationDrawer
+         style={{
+          position: 'fixed',
+        top: 0,
+        right: 0,
+        height: '100%',
+        width: '300px',
+        transform: 'translateY(100%)',
+        transition: 'transform 0.3s ease-in-out'
+        }}
+        onClick={() => setIsDrawerOpen(false)}
+         >
+           <NotificationDrawerBody>
+             <NotificationDrawerList >
+               {bannerNotifications?.map(({ _id, title,  }) => (
+                 <NotificationDrawerListItem
+                   key={_id}
+                   onClick={handleNotificationClick}
+                 >
+                   <NotificationDrawerListItemHeader
+                     title={title}
+                     variant="info"
+                   />
+     
+                 </NotificationDrawerListItem>
+               ))}
+             </NotificationDrawerList>
+           </NotificationDrawerBody>
+         </NotificationDrawer>
+      )}
+    </div>
               </ToolbarItem>
               <ToolbarItem>
                 <Popover
